@@ -674,8 +674,8 @@ void audiosettings_setup(void)
   class_addmethod(audiosettings_class, (t_method)audiosettings_listparams, gensym("listparams"), A_NULL);
 
 
-  class_addmethod(audiosettings_class, (t_method)audiosettings_setdriver, gensym("driver"), A_GIMME);
-  class_addmethod(audiosettings_class, (t_method)audiosettings_setparams, gensym("params"), A_GIMME);
+  class_addmethod(audiosettings_class, (t_method)audiosettings_setdriver, gensym("driver"), A_GIMME, A_NULL);
+  class_addmethod(audiosettings_class, (t_method)audiosettings_setparams, gensym("params"), A_GIMME, A_NULL);
 
   class_addmethod(audiosettings_class, (t_method)audiosettings_testdevices, gensym("testdevices"), A_NULL);
 

@@ -744,8 +744,8 @@ void midisettings_setup(void)
   class_addmethod(midisettings_class, (t_method)midisettings_listdrivers, gensym("listdrivers"), A_NULL);
   class_addmethod(midisettings_class, (t_method)midisettings_listdevices, gensym("listdevices"), A_NULL);
 
-  class_addmethod(midisettings_class, (t_method)midisettings_setdriver, gensym("driver"), A_GIMME);
-  class_addmethod(midisettings_class, (t_method)midisettings_setparams, gensym("device"), A_GIMME);
+  class_addmethod(midisettings_class, (t_method)midisettings_setdriver, gensym("driver"), A_GIMME, A_NULL);
+  class_addmethod(midisettings_class, (t_method)midisettings_setparams, gensym("device"), A_GIMME, A_NULL);
 
   class_addmethod(midisettings_class, (t_method)midisettings_debug, gensym("print"), A_NULL);
 }
