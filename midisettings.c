@@ -1,9 +1,9 @@
 /******************************************************
  *
  * midisettings - get/set midi preferences from within Pd-patches
- * Copyright (C) 2010 IOhannes m zmölnig
+ * Copyright (C) 2010-2012 IOhannes m zmÃ¶lnig
  *
- *   forum::für::umläute
+ *   forum::fÃ¼r::umlÃ¤ute
  *
  *   institute of electronic music and acoustics (iem)
  *   university of music and dramatic arts, graz (kug)
@@ -14,13 +14,7 @@
  * license: GNU General Public License v.3 or later
  *
  ******************************************************/
-#include "m_pd.h"
-#include "s_stuff.h"
-#include <stdio.h>
-#include <string.h>
-
-#define MAXNDEV 20
-#define DEVDESCSIZE 80
+#include "mediasettings.h"
 
 #ifndef MAXMIDIINDEV
 # define MAXMIDIINDEV 4
@@ -34,8 +28,6 @@
 #else
 # define MAXMIDIDEV MAXMIDIOUTDEV
 #endif
-
-
 
 extern int sys_midiapi;
 static t_class *midisettings_class;
@@ -168,8 +160,10 @@ t_ms_symkeys*ms_driverparse(t_ms_symkeys*drivers, const char*buf) {
         int length=stop-start;
         if(length>=MAXPDSTRING)length=MAXPDSTRING-1;
         snprintf(substring, length, "%s", buf+start+1);
-        
-        if(2==sscanf(substring, "%s %d", drivername, &driverid)) {
+
+        if(common_parsedriver(substring, length,
+                              drivername, MAXPDSTRING,
+                              &driverid)) {
           drivers=ms_symkeys_add(drivers, gensym(drivername), driverid, 0);
         } else {
           if((start+1)!=(stop)) /* empty APIs string */
