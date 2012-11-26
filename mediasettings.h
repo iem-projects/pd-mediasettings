@@ -1,9 +1,9 @@
 /******************************************************
  *
  * audiosettings - get/set audio preferences from within Pd-patches
- * Copyright (C) 2010-2012 IOhannes m zmölnig
+ * Copyright (C) 2010-2012 IOhannes m zmÃ¶lnig
  *
- *   forum::für::umläute
+ *   forum::fÃ¼r::umlÃ¤ute
  *
  *   institute of electronic music and acoustics (iem)
  *   university of music and dramatic arts, graz (kug)
