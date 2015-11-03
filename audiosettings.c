@@ -645,7 +645,7 @@ void audiosettings_setup(void)
 #ifdef AUDIOSETTINGS_VERSION
   startpost("          version:"AUDIOSETTINGS_VERSION);
 #endif
-  post("\tcompiled: "__DATE__"");
+  post("\tcompiled "BUILD_DATE"");
 
 #if (defined PD_MINOR_VERSION) && (PD_MINOR_VERSION < 43)
   if(1) {

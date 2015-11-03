@@ -23,6 +23,10 @@
 #define MAXNDEV 20
 #define DEVDESCSIZE 80
 
+#ifndef BUILD_DATE
+# define BUILD_DATE "on " __DATE__ " at " __TIME__
+#endif
+
 /**
  * find EOS of a string of tokens
  * where EOS might be indicated by \0, }

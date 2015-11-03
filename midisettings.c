@@ -729,7 +729,7 @@ void midisettings_setup(void)
 #ifdef MIDISETTINGS_VERSION
   startpost("          version:"MIDISETTINGS_VERSION);
 #endif
-  post("\tcompiled: "__DATE__"");
+  post("\tcompiled "BUILD_DATE"");
 
   midisettings_class = class_new(gensym("midisettings"), (t_newmethod)midisettings_new, (t_method)midisettings_free,
 			     sizeof(t_midisettings), 0, 0);
