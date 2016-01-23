@@ -102,3 +102,14 @@ int common_parsedriver(const char*str, const int inlen,
 
   return ret;
 }
+
+
+static
+void mediasettings_boilerplate(const char*name, const char*version) {
+  post("%s%c%s", name, (version?' ':'\0'), version);
+  verbose(0,"          compiled "BUILD_DATE"");
+  verbose(0,"          Copyright © 2010-2016 IOhannes m zmölnig");
+  verbose(0,"          for the IntegraLive project");
+  verbose(0,"          institute of electronic music and acoustics (iem), KUG, Graz");
+  verbose(0,"          published under the GNU General Public License version 3 or later");
+}

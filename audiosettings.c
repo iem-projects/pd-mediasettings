@@ -641,16 +641,13 @@ void audiosettings_setup(void)
 {
   s_pdsym=gensym("pd");
 
-  post("audiosettings: audio settings manager");
-  post("          Copyright (C) 2010 IOhannes m zmoelnig");
-  post("          for the IntegraLive project");
-  post("          institute of electronic music and acoustics (iem)");
-  post("          published under the GNU General Public License version 3 or later");
+  mediasettings_boilerplate("[audiosettings] audio settings manager",
 #ifdef AUDIOSETTINGS_VERSION
-  startpost("          version:"AUDIOSETTINGS_VERSION);
+                             AUDIOSETTINGS_VERSION
+#else
+                             0
 #endif
-  post("\tcompiled "BUILD_DATE"");
-
+                             );
 #if (defined PD_MINOR_VERSION) && (PD_MINOR_VERSION < 43)
   if(1) {
     int major, minor, bugfix;

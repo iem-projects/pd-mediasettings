@@ -725,15 +725,13 @@ void midisettings_setup(void)
 {
   s_pdsym=gensym("pd");
 
-  post("midisettings: midi settings manager");
-  post("          Copyright (C) 2010 IOhannes m zmoelnig");
-  post("          for the IntegraLive project");
-  post("          institute of electronic music and acoustics (iem)");
-  post("          published under the GNU General Public License version 3 or later");
+  mediasettings_boilerplate("[midisettings] midi settings manager",
 #ifdef MIDISETTINGS_VERSION
-  startpost("          version:"MIDISETTINGS_VERSION);
+                             MIDISETTINGS_VERSION
+#else
+                             0
 #endif
-  post("\tcompiled "BUILD_DATE"");
+                             );
 
   midisettings_class = class_new(gensym("midisettings"), (t_newmethod)midisettings_new, (t_method)midisettings_free,
 			     sizeof(t_midisettings), 0, 0);
