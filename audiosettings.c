@@ -16,6 +16,10 @@
  ******************************************************/
 #include "mediasettings.h"
 
+#if (!defined AUDIOSETTINGS_VERSION) && (defined VERSION)
+# define AUDIOSETTINGS_VERSION VERSION
+#endif
+
 #define MAXAUDIOINDEV 4
 #define MAXAUDIOOUTDEV 4
 

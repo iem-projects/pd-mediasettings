@@ -16,6 +16,10 @@
  ******************************************************/
 #include "mediasettings.h"
 
+#if (!defined MIDISETTINGS_VERSION) && (defined VERSION)
+# define MIDISETTINGS_VERSION VERSION
+#endif
+
 #ifndef MAXMIDIINDEV
 # define MAXMIDIINDEV 4
 #endif
