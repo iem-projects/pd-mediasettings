@@ -17,7 +17,7 @@ LICENSE.txt \
 README.txt \
 mediasettings-meta.pd
 
-cflags = -DVERSION=$(lib.version)
+cflags = -DVERSION='"$(lib.version)"'
 
 ################################################################################
 ### pdlibbuilder ###############################################################
