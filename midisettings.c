@@ -314,7 +314,7 @@ static void midisettings_listdevices_devices(t_outlet *outlet,
   SETSYMBOL(atoms+0, type);
   for(i=0; i<numdevs; i++) {
     char dummy[MAXPDSTRING];
-    char*devname=NULL;
+    const char*devname=NULL;
     if(API_ALSA == sys_midiapi) {
       snprintf(dummy, MAXPDSTRING, MS_ALSADEV_FORMAT, i);
       dummy[MAXPDSTRING-1]=0;
