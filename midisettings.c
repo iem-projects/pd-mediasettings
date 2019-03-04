@@ -100,7 +100,7 @@ static t_ms_symkeys*ms_symkeys_add(t_ms_symkeys*symkeys, t_symbol*name, int id, 
     return ms_symkeys_add(symkeys, gensym(buf), id, overwrite);
   }
 
-  
+
 
   symkey=(t_ms_symkeys*)getbytes(sizeof(t_ms_symkeys));
   symkey->name=name;
@@ -216,7 +216,7 @@ static void ms_params_print(t_ms_params*parms, const int terseness) {
   const int maxin =MAXMIDIINDEV;
   const int maxout=MAXMIDIOUTDEV;
 #else
-  const int maxin =parms->num_indev; 
+  const int maxin =parms->num_indev;
   const int maxout=parms->num_outdev;
 #endif
   verbose(terseness, "=================================<");
@@ -235,15 +235,15 @@ static void ms_params_print(t_ms_params*parms, const int terseness) {
 }
 
 static t_ms_symkeys*ms_params_adddevices(t_ms_symkeys*keys, unsigned int*number, char devlist[MAXNDEV][DEVDESCSIZE], unsigned int numdevs) {
- unsigned int num=0;
- if(number)num=*number;
- unsigned int i;
+  unsigned int num=0;
+  if(number)num=*number;
+  unsigned int i;
   for(i=0; i<numdevs; i++) {
     num++;
     keys=ms_symkeys_add(keys, gensym(devlist[i]), num, 1);
   }
- if(number)*number=num;
- return keys;
+  if(number)*number=num;
+  return keys;
 }
 
 static void ms_params_get(t_ms_params*parms) {
@@ -254,15 +254,15 @@ static void ms_params_get(t_ms_params*parms) {
   ms_symkeys_clear(parms->outdevices);
   memset(parms, 0, sizeof(t_ms_params));
 
-  sys_get_midi_devs((char*)indevlist, &indevs, 
-                    (char*)outdevlist, &outdevs, 
+  sys_get_midi_devs((char*)indevlist, &indevs,
+                    (char*)outdevlist, &outdevs,
                     MAXNDEV, DEVDESCSIZE);
-                    
+
   parms->num_indevices=0;
   parms->indevices=ms_params_adddevices(parms->indevices, &parms->num_indevices, indevlist, indevs);
   parms->num_outdevices=0;
   parms->outdevices=ms_params_adddevices(parms->outdevices, &parms->num_outdevices, outdevlist, outdevs);
-  
+
   sys_get_midi_params(&indevs , parms->indev,
                       &outdevs, parms->outdev);
 
@@ -271,9 +271,6 @@ static void ms_params_get(t_ms_params*parms) {
 
   // ms_params_print(parms, 0);
 }
-
-
-
 
 
 typedef struct _midisettings
@@ -290,13 +287,13 @@ static void midisettings_params_init(t_midisettings*x) {
   for(i=0; i<MAXMIDIOUTDEV; i++) x->x_params.outdev[i]=0;
 
   x->x_params.num_indev = x->x_params.num_outdev = 0;
-  
+
   ms_params_get(&x->x_params);
 }
 
 static void midisettings_debug(t_midisettings*x) {
- post("IN-DEVS");ms_symkeys_print(x->x_params.indevices);
- post("OUTDEVS");ms_symkeys_print(x->x_params.outdevices);
+  post("IN-DEVS");ms_symkeys_print(x->x_params.indevices);
+  post("OUTDEVS");ms_symkeys_print(x->x_params.outdevices);
 
 }
 
@@ -306,10 +303,10 @@ static void midisettings_debug(t_midisettings*x) {
  * 'device out <devnameX> <deviceY> ...'
  */
 static void midisettings_listdevices_devices(t_outlet *outlet,
-						t_symbol*type,
-						t_ms_symkeys*devices,
-						const unsigned int numdevs
-						) {
+                                             t_symbol*type,
+                                             t_ms_symkeys*devices,
+                                             const unsigned int numdevs
+  ) {
   unsigned int count=0, i=0;
   t_atom atoms[MAXMIDIDEV+1];
   SETSYMBOL(atoms+0, type);
@@ -323,7 +320,7 @@ static void midisettings_listdevices_devices(t_outlet *outlet,
     } else {
       t_symbol *s_devname=ms_symkeys_getname(devices, i);
       if(s_devname) {
-          devname=s_devname->s_name;
+        devname=s_devname->s_name;
       }
     }
     if(devname) {
@@ -336,13 +333,13 @@ static void midisettings_listdevices_devices(t_outlet *outlet,
 
 /* 'devicelist in <numdevices>' + 'devicelist in <devName> <devId>'
 /* 'devicelist out <numdevices>' + 'devicelist out <devName> <devId>'
- */
+*/
 static void midisettings_listdevices_devicelist(t_outlet *outlet,
 						t_symbol*type,
 						t_ms_symkeys*devices,
 						const unsigned int numdevs,
 						const unsigned int maxdevs
-						) {
+  ) {
   unsigned int i=0;
   t_atom atoms[MAXMIDIDEV+1];
   SETSYMBOL(atoms+0, type);
@@ -372,8 +369,6 @@ static void midisettings_listdevices_devicelist(t_outlet *outlet,
 }
 
 
-
-
 static void midisettings_listdevices(t_midisettings *x)
 {
   midisettings_listdevices_devices(x->x_info,
@@ -381,13 +376,10 @@ static void midisettings_listdevices(t_midisettings *x)
 				   x->x_params.indevices,
 				   x->x_params.num_indev);
 
-
   midisettings_listdevices_devices(x->x_info,
 				   gensym("out"),
 				   x->x_params.outdevices,
 				   x->x_params.num_outdev);
-
-
 
   midisettings_listdevices_devicelist(x->x_info,
 				      gensym("in"),
@@ -404,17 +396,17 @@ static void midisettings_listdevices(t_midisettings *x)
 
 static void midisettings_params_apply(t_midisettings*x) {
 /*
-     "pd midi-dialog ..."
-     #00: indev[0]
-     #01: indev[1]
-     #02: indev[2]
-     #03: indev[3]
-     #04: outdev[0]
-     #05: outdev[1]
-     #06: outdev[2]
-     #07: outdev[3]
-     #08: alsadevin
-     #09: alsadevout
+  "pd midi-dialog ..."
+  #00: indev[0]
+  #01: indev[1]
+  #02: indev[2]
+  #03: indev[3]
+  #04: outdev[0]
+  #05: outdev[1]
+  #06: outdev[2]
+  #07: outdev[3]
+  #08: alsadevin
+  #09: alsadevout
 */
 #if 0
 # define MIDIDIALOG_INDEVS MAXMIDIINDEV
@@ -448,7 +440,7 @@ static void midisettings_params_apply(t_midisettings*x) {
 
     SETFLOAT(argv+1*MIDIDIALOG_INDEVS+1*MIDIDIALOG_OUTDEVS+0,(t_float)x->x_params.num_indev );
     SETFLOAT(argv+1*MIDIDIALOG_INDEVS+1*MIDIDIALOG_OUTDEVS+1,(t_float)x->x_params.num_outdev);
-    
+
   } else {
     unsigned int pos=0;
     for(i=0; i<x->x_params.num_indev; i++) {
@@ -464,8 +456,8 @@ static void midisettings_params_apply(t_midisettings*x) {
     SETFLOAT(argv+1*MIDIDIALOG_INDEVS+1*MIDIDIALOG_OUTDEVS+1,(t_float)x->x_params.num_outdev);
   }
 
-  if (s_pdsym->s_thing) typedmess(s_pdsym->s_thing, 
-				  gensym("midi-dialog"), 
+  if (s_pdsym->s_thing) typedmess(s_pdsym->s_thing,
+				  gensym("midi-dialog"),
 				  argc,
 				  argv);
 }
@@ -509,7 +501,7 @@ static int midisettings_setparams_inout( int argc, t_atom*argv, t_ms_symkeys*dev
   const unsigned int length=midisettings_setparams_next(argc, argv);
   unsigned int len=length;
   unsigned int i;
-  
+
   if(len>maxnumdevices)
     len=maxnumdevices;
 
@@ -522,7 +514,7 @@ static int midisettings_setparams_inout( int argc, t_atom*argv, t_ms_symkeys*dev
       dev=atom_getint(argv);
       break;
     case A_SYMBOL:
-     // LATER: get the device-id from the device-name
+      // LATER: get the device-id from the device-name
       dev=ms_symkeys_getid(devices, atom_getsymbol(argv+i));
       if(dev<0) dev=0;
       break;
@@ -535,13 +527,13 @@ static int midisettings_setparams_inout( int argc, t_atom*argv, t_ms_symkeys*dev
 }
 
 static int midisettings_setparams_input(t_midisettings*x, int argc, t_atom*argv) {
-  int advance =  midisettings_setparams_inout(argc, argv, 
-                                       x->x_params.indevices, x->x_params.indev, &x->x_params.num_indev, MAXMIDIINDEV);
+  int advance =  midisettings_setparams_inout(argc, argv,
+                                              x->x_params.indevices, x->x_params.indev, &x->x_params.num_indev, MAXMIDIINDEV);
   return advance;
 }
 
 static int midisettings_setparams_output(t_midisettings*x, int argc, t_atom*argv) {
-  return  midisettings_setparams_inout(argc, argv, 
+  return  midisettings_setparams_inout(argc, argv,
                                        x->x_params.outdevices, x->x_params.outdev, &x->x_params.num_outdev, MAXMIDIOUTDEV);
 }
 
@@ -552,8 +544,8 @@ static void midisettings_setparams(t_midisettings *x, t_symbol*s, int argc, t_at
  *
  * normal midi: list up to four devices (each direction)
  * alsa   midi: choose number of ports (each direction)
-    
-*/
+
+ */
   int apply=1;
   int advance=0;
   t_paramtype param=PARAM_INVALID;
@@ -661,8 +653,8 @@ static void midisettings_setdriver(t_midisettings *x, t_symbol*s, int argc, t_at
   if (s_pdsym->s_thing) {
     t_atom ap[1];
     SETFLOAT(ap, id);
-    typedmess(s_pdsym->s_thing, 
-              gensym("midi-setapi"), 
+    typedmess(s_pdsym->s_thing,
+              gensym("midi-setapi"),
               1,
               ap);
   }
@@ -678,7 +670,7 @@ static void midisettings_listdrivers(t_midisettings *x)
   size_t count=0;
 
   SETSYMBOL(ap+0, ms_getdrivername(sys_midiapi));
-  outlet_anything(x->x_info, gensym("driver"), 1, ap);    
+  outlet_anything(x->x_info, gensym("driver"), 1, ap);
 
 
   for(driver=DRIVERS; driver; driver=driver->next) {
@@ -691,7 +683,7 @@ static void midisettings_listdrivers(t_midisettings *x)
   for(driver=DRIVERS; driver; driver=driver->next) {
     SETSYMBOL(ap+0, driver->name);
     SETFLOAT (ap+1, (t_float)(driver->id));
-    outlet_anything(x->x_info, gensym("driverlist"), 2, ap);    
+    outlet_anything(x->x_info, gensym("driverlist"), 2, ap);
   }
 }
 
@@ -731,14 +723,14 @@ void midisettings_setup(void)
 
   mediasettings_boilerplate("[midisettings] midi settings manager",
 #ifdef MIDISETTINGS_VERSION
-                             MIDISETTINGS_VERSION
+                            MIDISETTINGS_VERSION
 #else
-                             0
+                            0
 #endif
-                             );
+    );
 
   midisettings_class = class_new(gensym("midisettings"), (t_newmethod)midisettings_new, (t_method)midisettings_free,
-			     sizeof(t_midisettings), 0, 0);
+                                 sizeof(t_midisettings), 0, 0);
 
   class_addbang(midisettings_class, (t_method)midisettings_bang);
   class_addmethod(midisettings_class, (t_method)midisettings_listdrivers, gensym("listdrivers"), A_NULL);
@@ -758,7 +750,7 @@ static void midisettings_testdevices(t_midisettings *x)
 
   char indevlist[MAXNDEV][DEVDESCSIZE], outdevlist[MAXNDEV][DEVDESCSIZE];
   int indevs = 0, outdevs = 0;
- 
+
   sys_get_midi_devs((char*)indevlist, &indevs, (char*)outdevlist, &outdevs, MAXNDEV, DEVDESCSIZE);
 
   post("%d midi indevs", indevs);
@@ -773,8 +765,8 @@ static void midisettings_testdevices(t_midisettings *x)
   int nmidiindev, midiindev[MAXMIDIINDEV];
   int nmidioutdev, midioutdev[MAXMIDIOUTDEV];
   sys_get_midi_params(&nmidiindev, midiindev,
-                       &nmidioutdev, midioutdev);
-  
+                      &nmidioutdev, midioutdev);
+
   post("%d midiindev (parms)", nmidiindev);
   for(i=0; i<nmidiindev; i++) {
     post("\t#%02d: %d %d", i, midiindev[i]);
