@@ -304,14 +304,13 @@ static void midisettings_debug(t_midisettings*x) {
 /* 'device in <devname1> <devname2> ...'
  * 'device out <devnameX> <deviceY> ...'
  */
-static void midisettings_listdevices_devices(
-  t_outlet *outlet,
+static int midisettings_listdevices_devices(
+  t_atom *atoms, /* MAXMIDIDEV+1 atoms */
   t_symbol*type,
   t_ms_symkeys*devices,
   const unsigned int numdevs
   ) {
   unsigned int count=0, i=0;
-  t_atom atoms[MAXMIDIDEV+1];
   SETSYMBOL(atoms+0, type);
   for(i=0; i<numdevs; i++) {
     char dummy[MAXPDSTRING];
@@ -331,78 +330,96 @@ static void midisettings_listdevices_devices(
       count++;
     }
   }
-  outlet_anything(outlet, gensym("device"), count+1, atoms);
+  return count;
 }
 
 /* 'devicelist in <numdevices>' + 'devicelist in <devName> <devId>'
-/* 'devicelist out <numdevices>' + 'devicelist out <devName> <devId>'
-*/
-static void midisettings_listdevices_devicelist(
-  t_outlet *outlet,
+ * 'devicelist out <numdevices>' + 'devicelist out <devName> <devId>'
+ */
+static int midisettings_listdevices_devicelist(
+  t_atom*atoms, /* t_atom[MAXMIDIDEV*3] */
   t_symbol*type,
   t_ms_symkeys*devices,
   const unsigned int numdevs,
   const unsigned int maxdevs
   ) {
   unsigned int i=0;
-  t_atom atoms[MAXMIDIDEV+1];
-  SETSYMBOL(atoms+0, type);
+  int count = 0;
   if(API_ALSA == sys_midiapi) {
     char dummy[MAXPDSTRING];
-    unsigned int iodevs=maxdevs;
-    SETFLOAT (atoms+1, iodevs);
-    outlet_anything(outlet, gensym("devicelist"), 2, atoms);
-    for(i=0; i<iodevs; i++) {
+    for(i=0; i<maxdevs; i++) {
+      t_atom*curatoms = atoms+3*count;
+
       snprintf(dummy, MAXPDSTRING, MS_ALSADEV_FORMAT, i);
       dummy[MAXPDSTRING-1]=0;
-      SETSYMBOL(atoms+1, gensym(dummy));
-      SETFLOAT (atoms+2, (t_float)i);
-      outlet_anything(outlet, gensym("devicelist"), 3, atoms);
+      SETSYMBOL(curatoms+0, type);
+      SETSYMBOL(curatoms+1, gensym(dummy));
+      SETFLOAT (curatoms+2, (t_float)i);
+      count++;
     }
   } else {
-    SETFLOAT (atoms+1, (t_float)numdevs);
-    outlet_anything(outlet, gensym("devicelist"), 2, atoms);
     for(i=0; i<numdevs && devices; i++, devices=devices->next) {
+      t_atom*curatoms = atoms + 3*count;
       if(NULL==devices->name)
         continue;
-      SETSYMBOL(atoms+1, devices->name);
-      SETFLOAT (atoms+2, (t_float)(devices->id));
-      outlet_anything(outlet, gensym("devicelist"), 3, atoms);
+      SETSYMBOL(curatoms+0, type);
+      SETSYMBOL(curatoms+1, devices->name);
+      SETFLOAT (curatoms+2, (t_float)(devices->id));
+      count++;
     }
   }
+  return count;
 }
 
 
 static void midisettings_listdevices(t_midisettings *x)
 {
-  midisettings_listdevices_devices(
-    x->x_info,
+  t_atom indevices[MAXMIDIDEV+1], outdevices[MAXMIDIDEV+1];
+  t_atom indevlist[MAXMIDIDEV*3], outdevlist[MAXMIDIDEV*3];
+  t_atom devlenatoms[2];
+  int numindevices = 0, numoutdevices = 0;
+  int indevlistlen = 0, outdevlistlen = 0;
+  int i=0;
+
+  numindevices = midisettings_listdevices_devices(
+    indevices,
     gensym("in"),
     x->x_params.indevices,
     x->x_params.num_indev);
 
-  midisettings_listdevices_devices(
-    x->x_info,
+  numoutdevices=midisettings_listdevices_devices(
+    outdevices,
     gensym("out"),
     x->x_params.outdevices,
     x->x_params.num_outdev);
 
-  midisettings_listdevices_devicelist(
-    x->x_info,
+  indevlistlen = midisettings_listdevices_devicelist(
+    indevlist,
     gensym("in"),
     x->x_params.indevices,
     x->x_params.num_indevices,
     MAXMIDIINDEV);
 
-  midisettings_listdevices_devicelist(
-    x->x_info,
+  outdevlistlen = midisettings_listdevices_devicelist(
+    outdevlist,
     gensym("out"),
     x->x_params.outdevices,
     x->x_params.num_outdevices,
     MAXMIDIOUTDEV);
 
 
-
+  outlet_anything(x->x_info, gensym("device"), numindevices +1, indevices);
+  outlet_anything(x->x_info, gensym("device"), numoutdevices+1, outdevices);
+  SETSYMBOL(devlenatoms+0, gensym("in")) ; SETFLOAT(devlenatoms+1,  indevlistlen);
+  outlet_anything(x->x_info, gensym("devicelist"), 2, devlenatoms);
+  for(i=0; i<indevlistlen; i++) {
+    outlet_anything(x->x_info, gensym("devicelist"), 3, indevlist+3*i);
+  }
+  SETSYMBOL(devlenatoms+0, gensym("out")); SETFLOAT(devlenatoms+1, outdevlistlen);
+  outlet_anything(x->x_info, gensym("devicelist"), 2, devlenatoms);
+  for(i=0; i<outdevlistlen; i++) {
+    outlet_anything(x->x_info, gensym("devicelist"), 3, outdevlist+3*i);
+  }
 }
 
 static void midisettings_params_apply(t_midisettings*x) {
@@ -682,24 +699,33 @@ static void midisettings_setdriver(t_midisettings *x, t_symbol*s, int argc, t_at
 static void midisettings_listdrivers(t_midisettings *x)
 {
   t_ms_drivers*driver=NULL;
-  t_atom ap[2];
+  t_atom a1[1];
+  t_atom*adrivers=0;
   size_t count=0;
-
-  SETSYMBOL(ap+0, ms_getdrivername(sys_midiapi));
-  outlet_anything(x->x_info, gensym("driver"), 1, ap);
-
-
   for(driver=DRIVERS; driver; driver=driver->next) {
     count++;
   }
+  adrivers=getbytes(sizeof(t_atom) * (count+2));
+  if(adrivers) {
+    size_t i;
+    for(driver=DRIVERS, i=0; driver; driver=driver->next, i++) {
+      SETSYMBOL(adrivers+i*2+0, driver->name);
+      SETFLOAT (adrivers+i*2+1, (t_float)(driver->id));
+    }
+  }
 
-  SETFLOAT(ap+0, count);
-  outlet_anything(x->x_info, gensym("driverlist"), 1, ap);
+  SETSYMBOL(a1+0, ms_getdrivername(sys_midiapi));
+  outlet_anything(x->x_info, gensym("driver"), 1, a1);
 
-  for(driver=DRIVERS; driver; driver=driver->next) {
-    SETSYMBOL(ap+0, driver->name);
-    SETFLOAT (ap+1, (t_float)(driver->id));
-    outlet_anything(x->x_info, gensym("driverlist"), 2, ap);
+  SETFLOAT(a1+0, count);
+  outlet_anything(x->x_info, gensym("driverlist"), 1, a1);
+
+  if(adrivers) {
+    size_t i;
+    for(i=0; i<count; i++) {
+      outlet_anything(x->x_info, gensym("driverlist"), 2, adrivers+2*i);
+    }
+    freebytes(adrivers, (sizeof(t_atom) * (count+2)));
   }
 }
 
