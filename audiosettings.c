@@ -27,23 +27,9 @@ static void as_get_audio_params(
     int *pnaudioindev, int *paudioindev, int *pchindev,
     int *pnaudiooutdev, int *paudiooutdev, int *pchoutdev,
     int *prate, int *padvance, int *pcallback, int *pblocksize) {
-#if (defined PD_MINOR_VERSION) && (PD_MINOR_VERSION >= 43)
   sys_get_audio_params(pnaudioindev , paudioindev , pchindev,
                        pnaudiooutdev, paudiooutdev, pchoutdev,
                        prate, padvance, pcallback, pblocksize);
-#else
-  if(pblocksize)
-   *pblocksize=-1;
-
-  sys_get_audio_params(pnaudioindev , paudioindev , pchindev,
-                       pnaudiooutdev, paudiooutdev, pchoutdev,
-                       prate, padvance, pcallback);
-
-
-#endif
-
-
-
 }
 
 
@@ -595,20 +581,9 @@ static void audiosettings_setdriver(t_audiosettings *x, t_symbol*s, int argc, t_
     return;
   }
   verbose(1, "setting driver '%s' (=%d)", s->s_name, id);
-#ifdef HAVE_SYS_CLOSE_AUDIO
   sys_close_audio();
   sys_set_audio_api(id);
   sys_reopen_audio();
-#else
-  if (s_pdsym->s_thing) {
-    t_atom ap[1];
-    SETFLOAT(ap, id);
-    typedmess(s_pdsym->s_thing, 
-              gensym("audio-setapi"), 
-              1,
-              ap);
-  }
-#endif
 }
 
 static void audiosettings_bang(t_audiosettings *x) {
@@ -648,18 +623,6 @@ void audiosettings_setup(void)
                              0
 #endif
                              );
-#if (defined PD_MINOR_VERSION) && (PD_MINOR_VERSION < 43)
-  if(1) {
-    int major, minor, bugfix;
-    sys_getversion(&major, &minor, &bugfix);
-    if(0==major && minor>=43) {
-    error("[audiosettings] have been compiled against an old version of Pd");
-    error("                that is incompatible with the one you are using!");
-    error("                recompile [audiosettings]");
-    }
-    return;
-  }
-#endif
 
   audiosettings_class = class_new(gensym("audiosettings"), (t_newmethod)audiosettings_new, (t_method)audiosettings_free,
 			     sizeof(t_audiosettings), 0, 0);

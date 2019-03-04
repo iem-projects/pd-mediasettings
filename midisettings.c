@@ -678,20 +678,9 @@ static void midisettings_setdriver(t_midisettings *x, t_symbol*s, int argc, t_at
     }
     verbose(1, "setting driver '%s' (=%d)", s->s_name, id);
   }
-#ifdef HAVE_SYS_CLOSE_MIDI
   sys_close_midi();
   sys_set_midi_api(id);
   sys_reopen_midi();
-#else
-  if (s_pdsym->s_thing) {
-    t_atom ap[1];
-    SETFLOAT(ap, id);
-    typedmess(s_pdsym->s_thing,
-              gensym("midi-setapi"),
-              1,
-              ap);
-  }
-#endif
 }
 
 /*
