@@ -1,7 +1,7 @@
 /******************************************************
  *
  * audiosettings - get/set audio preferences from within Pd-patches
- * Copyright (C) 2010-2012 IOhannes m zmölnig
+ * Copyright (C) 2010-2019 IOhannes m zmölnig
  *
  *   forum::für::umläute
  *
