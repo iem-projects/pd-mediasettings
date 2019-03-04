@@ -234,7 +234,9 @@ static void ms_params_print(t_ms_params*parms, const int terseness) {
   verbose(terseness, ">=================================");
 }
 
-static t_ms_symkeys*ms_params_adddevices(t_ms_symkeys*keys, unsigned int*number, char devlist[MAXNDEV][DEVDESCSIZE], unsigned int numdevs) {
+static t_ms_symkeys*ms_params_adddevices(
+  t_ms_symkeys*keys, unsigned int*number,
+  char devlist[MAXNDEV][DEVDESCSIZE], unsigned int numdevs) {
   unsigned int num=0;
   if(number)num=*number;
   unsigned int i;
@@ -302,10 +304,11 @@ static void midisettings_debug(t_midisettings*x) {
 /* 'device in <devname1> <devname2> ...'
  * 'device out <devnameX> <deviceY> ...'
  */
-static void midisettings_listdevices_devices(t_outlet *outlet,
-                                             t_symbol*type,
-                                             t_ms_symkeys*devices,
-                                             const unsigned int numdevs
+static void midisettings_listdevices_devices(
+  t_outlet *outlet,
+  t_symbol*type,
+  t_ms_symkeys*devices,
+  const unsigned int numdevs
   ) {
   unsigned int count=0, i=0;
   t_atom atoms[MAXMIDIDEV+1];
@@ -334,11 +337,12 @@ static void midisettings_listdevices_devices(t_outlet *outlet,
 /* 'devicelist in <numdevices>' + 'devicelist in <devName> <devId>'
 /* 'devicelist out <numdevices>' + 'devicelist out <devName> <devId>'
 */
-static void midisettings_listdevices_devicelist(t_outlet *outlet,
-						t_symbol*type,
-						t_ms_symkeys*devices,
-						const unsigned int numdevs,
-						const unsigned int maxdevs
+static void midisettings_listdevices_devicelist(
+  t_outlet *outlet,
+  t_symbol*type,
+  t_ms_symkeys*devices,
+  const unsigned int numdevs,
+  const unsigned int maxdevs
   ) {
   unsigned int i=0;
   t_atom atoms[MAXMIDIDEV+1];
@@ -371,27 +375,34 @@ static void midisettings_listdevices_devicelist(t_outlet *outlet,
 
 static void midisettings_listdevices(t_midisettings *x)
 {
-  midisettings_listdevices_devices(x->x_info,
-				   gensym("in"),
-				   x->x_params.indevices,
-				   x->x_params.num_indev);
+  midisettings_listdevices_devices(
+    x->x_info,
+    gensym("in"),
+    x->x_params.indevices,
+    x->x_params.num_indev);
 
-  midisettings_listdevices_devices(x->x_info,
-				   gensym("out"),
-				   x->x_params.outdevices,
-				   x->x_params.num_outdev);
+  midisettings_listdevices_devices(
+    x->x_info,
+    gensym("out"),
+    x->x_params.outdevices,
+    x->x_params.num_outdev);
 
-  midisettings_listdevices_devicelist(x->x_info,
-				      gensym("in"),
-				      x->x_params.indevices,
-				      x->x_params.num_indevices,
-				      MAXMIDIINDEV);
+  midisettings_listdevices_devicelist(
+    x->x_info,
+    gensym("in"),
+    x->x_params.indevices,
+    x->x_params.num_indevices,
+    MAXMIDIINDEV);
 
-  midisettings_listdevices_devicelist(x->x_info,
-				      gensym("out"),
-				      x->x_params.outdevices,
-				      x->x_params.num_outdevices,
-				      MAXMIDIOUTDEV);
+  midisettings_listdevices_devicelist(
+    x->x_info,
+    gensym("out"),
+    x->x_params.outdevices,
+    x->x_params.num_outdevices,
+    MAXMIDIOUTDEV);
+
+
+
 }
 
 static void midisettings_params_apply(t_midisettings*x) {
@@ -497,7 +508,10 @@ static int midisettings_setparams_next(int argc, t_atom*argv) {
 }
 
 /* [<device1> [<deviceN>]*] ... */
-static int midisettings_setparams_inout( int argc, t_atom*argv, t_ms_symkeys*devices, int*devicelist, unsigned int*numdevices, const unsigned int maxnumdevices ) {
+static int midisettings_setparams_inout(
+  int argc, t_atom*argv,
+  t_ms_symkeys*devices, int*devicelist, unsigned int*numdevices,
+  const unsigned int maxnumdevices ) {
   const unsigned int length=midisettings_setparams_next(argc, argv);
   unsigned int len=length;
   unsigned int i;
@@ -527,14 +541,16 @@ static int midisettings_setparams_inout( int argc, t_atom*argv, t_ms_symkeys*dev
 }
 
 static int midisettings_setparams_input(t_midisettings*x, int argc, t_atom*argv) {
-  int advance =  midisettings_setparams_inout(argc, argv,
-                                              x->x_params.indevices, x->x_params.indev, &x->x_params.num_indev, MAXMIDIINDEV);
+  int advance =  midisettings_setparams_inout(
+    argc, argv,
+    x->x_params.indevices, x->x_params.indev, &x->x_params.num_indev, MAXMIDIINDEV);
   return advance;
 }
 
 static int midisettings_setparams_output(t_midisettings*x, int argc, t_atom*argv) {
-  return  midisettings_setparams_inout(argc, argv,
-                                       x->x_params.outdevices, x->x_params.outdev, &x->x_params.num_outdev, MAXMIDIOUTDEV);
+  return  midisettings_setparams_inout(
+    argc, argv,
+    x->x_params.outdevices, x->x_params.outdev, &x->x_params.num_outdev, MAXMIDIOUTDEV);
 }
 
 static void midisettings_setparams(t_midisettings *x, t_symbol*s, int argc, t_atom*argv) {
@@ -729,8 +745,11 @@ void midisettings_setup(void)
 #endif
     );
 
-  midisettings_class = class_new(gensym("midisettings"), (t_newmethod)midisettings_new, (t_method)midisettings_free,
-                                 sizeof(t_midisettings), 0, 0);
+  midisettings_class = class_new(gensym("midisettings"),
+                                 (t_newmethod)midisettings_new,
+                                 (t_method)midisettings_free,
+                                 sizeof(t_midisettings),
+                                 0, 0);
 
   class_addbang(midisettings_class, (t_method)midisettings_bang);
   class_addmethod(midisettings_class, (t_method)midisettings_listdrivers, gensym("listdrivers"), A_NULL);
