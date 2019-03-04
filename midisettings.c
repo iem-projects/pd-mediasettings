@@ -302,6 +302,9 @@ static void midisettings_debug(t_midisettings*x) {
 
 #define MS_ALSADEV_FORMAT "ALSA-%02d"
 
+/* 'device in <devname1> <devname2> ...'
+ * 'device out <devnameX> <deviceY> ...'
+ */
 static void midisettings_listdevices_devices(t_outlet *outlet,
 						t_symbol*type,
 						t_ms_symkeys*devices,
@@ -331,6 +334,9 @@ static void midisettings_listdevices_devices(t_outlet *outlet,
   outlet_anything(outlet, gensym("device"), count+1, atoms);
 }
 
+/* 'devicelist in <numdevices>' + 'devicelist in <devName> <devId>'
+/* 'devicelist out <numdevices>' + 'devicelist out <devName> <devId>'
+ */
 static void midisettings_listdevices_devicelist(t_outlet *outlet,
 						t_symbol*type,
 						t_ms_symkeys*devices,
