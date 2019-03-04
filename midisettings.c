@@ -210,7 +210,7 @@ typedef struct _ms_params {
   unsigned int num_indevices, num_outdevices;
 } t_ms_params;
 
-static void ms_params_print(t_ms_params*parms) {
+static void ms_params_print(t_ms_params*parms, const int terseness) {
   int i=0;
 #if 0
   const int maxin =MAXMIDIINDEV;
@@ -219,21 +219,19 @@ static void ms_params_print(t_ms_params*parms) {
   const int maxin =parms->num_indev; 
   const int maxout=parms->num_outdev;
 #endif
-
-  post("\n=================================<");
+  verbose(terseness, "=================================<");
   if(API_ALSA == sys_midiapi) {
-    post("alsamidi: %d %d", parms->num_indev, parms->num_outdev);
+    verbose(terseness, "alsamidi: %d %d", parms->num_indev, parms->num_outdev);
   } else {
     for(i=0; i<maxin; i++) {
-      post("indev[%d]: %d", i, parms->indev[i]);
+      verbose(terseness, "indev[%d]: %d", i, parms->indev[i]);
     }
     for(i=0; i<maxout; i++) {
-      post("outdev[%d]: %d", i, parms->outdev[i]);
+      verbose(terseness, "outdev[%d]: %d", i, parms->outdev[i]);
     }
   }
 
-  post(">=================================\n");
-
+  verbose(terseness, ">=================================");
 }
 
 static t_ms_symkeys*ms_params_adddevices(t_ms_symkeys*keys, unsigned int*number, char devlist[MAXNDEV][DEVDESCSIZE], unsigned int numdevs) {
@@ -271,7 +269,7 @@ static void ms_params_get(t_ms_params*parms) {
   parms->num_indev =(indevs >0)?indevs:0;
   parms->num_outdev=(outdevs>0)?outdevs:0;
 
-  // ms_params_print(parms);
+  // ms_params_print(parms, 0);
 }
 
 
@@ -427,7 +425,7 @@ static void midisettings_params_apply(t_midisettings*x) {
 
   unsigned int i=0;
 
-  ms_params_print(&x->x_params);
+  ms_params_print(&x->x_params, 0);
 
   for(i=0; i<argc; i++) {
     SETFLOAT(argv+i, (t_float)0);
