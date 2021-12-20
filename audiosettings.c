@@ -40,6 +40,13 @@
 # define DEFDACBLKSIZE 64
 #endif
 
+
+#if (defined PD_MAJOR_VERSION && defined PD_MINOR_VERSION) && (PD_MAJOR_VERSION > 0 || PD_MINOR_VERSION >= 52)
+# define AUDIOSETTINGS_API 1
+#else
+# define AUDIOSETTINGS_API 0
+#endif
+
 typedef struct _as_drivers {
   t_symbol*name;
   int      id;
@@ -47,15 +54,8 @@ typedef struct _as_drivers {
   struct _as_drivers *next;
 } t_as_drivers;
 
-typedef struct _as_params {
-  int api;
-  int naudioindev, audioindev[MAXAUDIOINDEV], chindev[MAXAUDIOINDEV];
-  int naudiooutdev, audiooutdev[MAXAUDIOOUTDEV], choutdev[MAXAUDIOOUTDEV];
-  int rate, advance, callback;
-  int blocksize;
-} t_as_params;
 
-#if (defined PD_MAJOR_VERSION && defined PD_MINOR_VERSION) && (PD_MAJOR_VERSION > 0 || PD_MINOR_VERSION >= 52)
+#if AUDIOSETTINGS_API == 1
 void sys_set_audio_api(const int api) {
 #if 0
   if (s_pdsym->s_thing) {
@@ -82,7 +82,23 @@ void sys_set_audio_api(const int api) {
   sys_set_audio_settings(&as);
 }
 
-#else
+static void as_get_audio_devs(
+    char *indevlist, int *nindevs,
+    char *outdevlist, int *noutdevs,
+    int *canmulti, int *cancallback,
+    int maxndev, int devdescsize,
+    int *api) {
+  t_audiosettings as;
+  sys_get_audio_settings(&as);
+  if(api)
+    *api = as.a_api;
+  sys_get_audio_devs(indevlist, nindevs,
+      outdevlist, noutdevs,
+      canmulti, cancallback,
+      maxndev, devdescsize, as.a_api);
+}
+
+#elif AUDIOSETTINGS_API == 0
 typedef struct _audiosettings
 {
     int a_api;
@@ -122,26 +138,7 @@ static void sys_get_audio_settings(t_audiosettings*parms) {
   }
   parms->a_nchoutdev = parms->a_noutdev;
 }
-#endif
 
-
-#if (defined PD_MAJOR_VERSION && defined PD_MINOR_VERSION) && (PD_MAJOR_VERSION > 0 || PD_MINOR_VERSION >= 52)
-static void as_get_audio_devs(
-    char *indevlist, int *nindevs,
-    char *outdevlist, int *noutdevs,
-    int *canmulti, int *cancallback,
-    int maxndev, int devdescsize,
-    int *api) {
-  t_audiosettings as;
-  sys_get_audio_settings(&as);
-  if(api)
-    *api = as.a_api;
-  sys_get_audio_devs(indevlist, nindevs,
-      outdevlist, noutdevs,
-      canmulti, cancallback,
-      maxndev, devdescsize, as.a_api);
-}
-#else
 static void as_get_audio_devs(
     char *indevlist, int *nindevs,
     char *outdevlist, int *noutdevs,
