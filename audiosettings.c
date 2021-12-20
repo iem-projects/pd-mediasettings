@@ -193,18 +193,18 @@ static void as_params_get(t_as_params*parms) {
 
 
 
-typedef struct _audiosettings
+typedef struct _mediasettings_audiosettings
 {
   t_object x_obj;
   t_outlet*x_info;
 
 
   t_as_params x_params;
-} t_audiosettings;
+} t_mediasettings_audiosettings;
 
 
-static void audiosettings_listparams(t_audiosettings *x);
-static void audiosettings_listdevices(t_audiosettings *x)
+static void audiosettings_listparams(t_mediasettings_audiosettings *x);
+static void audiosettings_listdevices(t_mediasettings_audiosettings *x)
 {
   int i;
 
@@ -258,7 +258,7 @@ static void audiosettings_listdevices(t_audiosettings *x)
 /* this is the actual settings used
  *
  */
-static void audiosettings_listparams(t_audiosettings *x) {
+static void audiosettings_listparams(t_mediasettings_audiosettings *x) {
   int i;
   t_atom atoms[4];
 
@@ -303,10 +303,10 @@ static void audiosettings_listparams(t_audiosettings *x) {
 }
 
 
-static void audiosettings_params_init(t_audiosettings*x) {
+static void audiosettings_params_init(t_mediasettings_audiosettings*x) {
   as_params_get(&x->x_params);
 }
-static void audiosettings_params_apply(t_audiosettings*x) {
+static void audiosettings_params_apply(t_mediasettings_audiosettings*x) {
 /*
      "pd audio-dialog ..."
      #00: indev[0]
@@ -401,7 +401,7 @@ static int audiosettings_setparams_next(int argc, t_atom*argv) {
 }
 
 /* <rate> ... */
-static int audiosettings_setparams_rate(t_audiosettings*x, int argc, t_atom*argv) {
+static int audiosettings_setparams_rate(t_mediasettings_audiosettings*x, int argc, t_atom*argv) {
   if(argc<=0)return 1;
   t_int rate=atom_getint(argv);
   if(rate>0)
@@ -410,7 +410,7 @@ static int audiosettings_setparams_rate(t_audiosettings*x, int argc, t_atom*argv
 }
 
 /* <advance> ... */
-static int audiosettings_setparams_advance(t_audiosettings*x, int argc, t_atom*argv) {
+static int audiosettings_setparams_advance(t_mediasettings_audiosettings*x, int argc, t_atom*argv) {
   if(argc<=0)return 1;
   t_int advance=atom_getint(argv);
   if(advance>0)
@@ -420,7 +420,7 @@ static int audiosettings_setparams_advance(t_audiosettings*x, int argc, t_atom*a
 }
 
 /* <callback?> ... */
-static int audiosettings_setparams_callback(t_audiosettings*x, int argc, t_atom*argv) {
+static int audiosettings_setparams_callback(t_mediasettings_audiosettings*x, int argc, t_atom*argv) {
   if(argc<=0)return 1;
   t_int callback=atom_getint(argv);
   x->x_params.callback=callback;
@@ -429,7 +429,7 @@ static int audiosettings_setparams_callback(t_audiosettings*x, int argc, t_atom*
 }
 
 /* [<device> <channels>]* ... */
-static int audiosettings_setparams_input(t_audiosettings*x, int argc, t_atom*argv) {
+static int audiosettings_setparams_input(t_mediasettings_audiosettings*x, int argc, t_atom*argv) {
   int length=audiosettings_setparams_next(argc, argv);
   int i;
   int numpairs=length/2;
@@ -460,7 +460,7 @@ static int audiosettings_setparams_input(t_audiosettings*x, int argc, t_atom*arg
   return length;
 }
 
-static int audiosettings_setparams_output(t_audiosettings*x, int argc, t_atom*argv) {
+static int audiosettings_setparams_output(t_mediasettings_audiosettings*x, int argc, t_atom*argv) {
   int length=audiosettings_setparams_next(argc, argv);
   int i;
   int numpairs=length/2;
@@ -491,7 +491,7 @@ static int audiosettings_setparams_output(t_audiosettings*x, int argc, t_atom*ar
   return length;
 }
 
-static void audiosettings_setparams(t_audiosettings *x, t_symbol*s, int argc, t_atom*argv) {
+static void audiosettings_setparams(t_mediasettings_audiosettings *x, t_symbol*s, int argc, t_atom*argv) {
 /*
   PLAN:
     several messages that accumulate to a certain settings, and then "apply" them
@@ -541,12 +541,12 @@ static void audiosettings_setparams(t_audiosettings *x, t_symbol*s, int argc, t_
   }
 }
 
-static void audiosettings_testdevices(t_audiosettings *x);
+static void audiosettings_testdevices(t_mediasettings_audiosettings *x);
 
 
 /*
  */
-static void audiosettings_listdrivers(t_audiosettings *x)
+static void audiosettings_listdrivers(t_mediasettings_audiosettings *x)
 {
   t_as_drivers*driver=NULL;
   t_atom ap[2];
@@ -558,7 +558,7 @@ static void audiosettings_listdrivers(t_audiosettings *x)
   }
 }
 
-static void audiosettings_setdriver(t_audiosettings *x, t_symbol*s, int argc, t_atom*argv) {
+static void audiosettings_setdriver(t_mediasettings_audiosettings *x, t_symbol*s, int argc, t_atom*argv) {
   int id=-1;
   s=gensym("<unknown>"); /* just re-use the argument, which is not needed anyhow */
   switch(argc) {
@@ -586,21 +586,21 @@ static void audiosettings_setdriver(t_audiosettings *x, t_symbol*s, int argc, t_
   sys_reopen_audio();
 }
 
-static void audiosettings_bang(t_audiosettings *x) {
+static void audiosettings_bang(t_mediasettings_audiosettings *x) {
   audiosettings_listdrivers(x);
   audiosettings_listdevices(x);
   audiosettings_listparams(x);
 }
 
 
-static void audiosettings_free(t_audiosettings *x){
+static void audiosettings_free(t_mediasettings_audiosettings *x){
 
 }
 
 
 static void *audiosettings_new(void)
 {
-  t_audiosettings *x = (t_audiosettings *)pd_new(audiosettings_class);
+  t_mediasettings_audiosettings *x = (t_mediasettings_audiosettings *)pd_new(audiosettings_class);
   x->x_info=outlet_new(&x->x_obj, 0);
 
   char buf[MAXPDSTRING];
@@ -625,7 +625,7 @@ void audiosettings_setup(void)
                              );
 
   audiosettings_class = class_new(gensym("audiosettings"), (t_newmethod)audiosettings_new, (t_method)audiosettings_free,
-			     sizeof(t_audiosettings), 0, 0);
+			     sizeof(t_mediasettings_audiosettings), 0, 0);
 
   class_addbang(audiosettings_class, (t_method)audiosettings_bang);
   class_addmethod(audiosettings_class, (t_method)audiosettings_listdrivers, gensym("listdrivers"), A_NULL);
@@ -641,7 +641,7 @@ void audiosettings_setup(void)
 }
 
 
-static void audiosettings_testdevices(t_audiosettings *x)
+static void audiosettings_testdevices(t_mediasettings_audiosettings *x)
 {
   int i;
 
