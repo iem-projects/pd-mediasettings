@@ -726,6 +726,7 @@ static void midisettings_bang(t_midisettings *x) {
 
 static void midisettings_free(t_midisettings *x){
 #warning cleanup
+  (void)x;
 }
 
 
@@ -784,6 +785,7 @@ static void midisettings_testdevices(t_midisettings *x)
 
   char indevlist[MAXNDEV][DEVDESCSIZE], outdevlist[MAXNDEV][DEVDESCSIZE];
   int indevs = 0, outdevs = 0;
+  (void)x;
 
   sys_get_midi_devs((char*)indevlist, &indevs, (char*)outdevlist, &outdevs, MAXNDEV, DEVDESCSIZE);
 
